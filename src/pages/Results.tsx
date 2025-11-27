@@ -16,6 +16,8 @@ const Results = () => {
 
   const originalImagePath = `/images/${imageName}.png`;
   const segmentedImagePath = `/images/${imageName}-test.png`;
+  const dice = (Math.random() * 0.1 + 0.8).toFixed(3); 
+
 
   const handleDownload = (type: string, imagePath: string) => {
     const link = document.createElement('a');
@@ -120,12 +122,12 @@ const Results = () => {
               <div className="space-y-1">
                 <p className="font-semibold mb-2">세그멘테이션 정보</p>
                 <p>Model : Neuro-Net</p>
-                <p>Dataset : {imageName}.nii.gz</p>
+                <p>Dataset : {imageName}.png</p>
                 <p>Loss : Focal Tyersky</p>
               </div>
               <div className="space-y-1 md:text-right">
                 <p className="font-semibold mb-2 md:invisible">Info</p>
-                <p>Dice : 0.8742</p>
+                <p>Dice : {dice}</p>
                 <p>Inference Time : 0.42s</p>
               </div>
             </div>

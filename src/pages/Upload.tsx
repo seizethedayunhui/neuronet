@@ -88,7 +88,7 @@ const Upload = () => {
             <div className="space-y-1">
               <p>지원 파일 형식: JPG, PNG, NIfTI (.nii, .nii.gz)</p>
               <p>권장 해상도: 240 × 240</p>
-              <p>업로드 후 Segment 버튼이 활성화됩니다.</p>
+              <p>업로드 후 Segmentation이 활성화됩니다.</p>
             </div>
           </InfoBox>
         </div>
