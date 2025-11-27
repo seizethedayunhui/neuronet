@@ -13,17 +13,21 @@ const Upload = () => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/octet-stream'];
-      const validExtensions = ['.png', '.jpg', '.jpeg', '.nii', '.gz'];
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      const validExtensions = ['.png', '.jpg', '.jpeg'];
       const hasValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
       
       if (validTypes.includes(file.type) || hasValidExtension) {
         setSelectedFile(file);
         toast.success("파일이 선택되었습니다.");
-        // 실제 구현에서는 여기서 파일을 업로드하고 분석을 시작합니다
+        
+        // 파일명에서 숫자 추출 (예: "1.png" -> "1")
+        const fileNameWithoutExt = file.name.replace(/\.(png|jpg|jpeg)$/i, '');
+        
+        // 결과 페이지로 이동하면서 파일명 전달
         setTimeout(() => {
-          navigate("/results");
-        }, 1500);
+          navigate(`/results?image=${encodeURIComponent(fileNameWithoutExt)}`);
+        }, 1000);
       } else {
         toast.error("지원하지 않는 파일 형식입니다.");
       }
@@ -58,7 +62,7 @@ const Upload = () => {
                 id="file-upload"
                 type="file"
                 className="hidden"
-                accept=".png,.jpg,.jpeg,.nii,.nii.gz"
+                accept=".png,.jpg,.jpeg"
                 onChange={handleFileSelect}
               />
               <Button 
