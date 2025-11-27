@@ -1,18 +1,55 @@
-import { Download } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BrainLogo from "@/components/BrainLogo";
 import InfoBox from "@/components/InfoBox";
 import { toast } from "sonner";
 
 const Results = () => {
-  const handleDownload = (type: string) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const imageName = searchParams.get("image") || "1";
+  
+  const [originalImageError, setOriginalImageError] = useState(false);
+  const [segmentedImageError, setSegmentedImageError] = useState(false);
+
+  const originalImagePath = `/images/${imageName}.png`;
+  const segmentedImagePath = `/images/${imageName}-test.png`;
+
+  const handleDownload = (type: string, imagePath: string) => {
+    const link = document.createElement('a');
+    link.href = imagePath;
+    link.download = imagePath.split('/').pop() || 'download.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     toast.success(`${type}를 다운로드합니다.`);
-    // 실제 구현에서는 여기서 파일 다운로드를 처리합니다
+  };
+
+  const handleImageError = (type: 'original' | 'segmented') => {
+    if (type === 'original') {
+      setOriginalImageError(true);
+    } else {
+      setSegmentedImageError(true);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            돌아가기
+          </Button>
+        </div>
+
         <BrainLogo />
         
         <div className="bg-card rounded-3xl shadow-lg p-12">
@@ -26,14 +63,24 @@ const Results = () => {
             <div className="space-y-4">
               <p className="text-center font-medium text-foreground">Original Image</p>
               <div className="aspect-square bg-black rounded-2xl overflow-hidden flex items-center justify-center">
-                <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center">
-                  <div className="text-white/50 text-sm">MRI Scan</div>
-                </div>
+                {originalImageError ? (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center">
+                    <div className="text-white/50 text-sm">이미지를 찾을 수 없습니다</div>
+                  </div>
+                ) : (
+                  <img
+                    src={originalImagePath}
+                    alt="Original MRI"
+                    className="w-full h-full object-contain"
+                    onError={() => handleImageError('original')}
+                  />
+                )}
               </div>
               <Button 
                 variant="default" 
                 className="w-full rounded-xl py-6 text-base"
-                onClick={() => handleDownload("마스크")}
+                onClick={() => handleDownload("마스크", originalImagePath)}
+                disabled={originalImageError}
               >
                 마스크 다운로드
               </Button>
@@ -43,15 +90,24 @@ const Results = () => {
             <div className="space-y-4">
               <p className="text-center font-medium text-foreground">Segmented Tumor</p>
               <div className="aspect-square bg-black rounded-2xl overflow-hidden flex items-center justify-center">
-                <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center relative">
-                  <div className="text-white/50 text-sm">MRI Scan</div>
-                  <div className="absolute top-1/2 right-1/3 w-12 h-8 bg-green-500/60 rounded-full blur-sm"></div>
-                </div>
+                {segmentedImageError ? (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center">
+                    <div className="text-white/50 text-sm">이미지를 찾을 수 없습니다</div>
+                  </div>
+                ) : (
+                  <img
+                    src={segmentedImagePath}
+                    alt="Segmented Tumor"
+                    className="w-full h-full object-contain"
+                    onError={() => handleImageError('segmented')}
+                  />
+                )}
               </div>
               <Button 
                 variant="default" 
                 className="w-full rounded-xl py-6 text-base"
-                onClick={() => handleDownload("결과")}
+                onClick={() => handleDownload("결과", segmentedImagePath)}
+                disabled={segmentedImageError}
               >
                 결과 다운로드
               </Button>
@@ -64,7 +120,7 @@ const Results = () => {
               <div className="space-y-1">
                 <p className="font-semibold mb-2">세그멘테이션 정보</p>
                 <p>Model : Neuro-Net</p>
-                <p>Dataset : BraTS-men-00024.nii.gz</p>
+                <p>Dataset : {imageName}.nii.gz</p>
                 <p>Loss : Focal Tyersky</p>
               </div>
               <div className="space-y-1 md:text-right">
