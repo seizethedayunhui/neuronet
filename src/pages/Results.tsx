@@ -14,8 +14,8 @@ const Results = () => {
   const [originalImageError, setOriginalImageError] = useState(false);
   const [segmentedImageError, setSegmentedImageError] = useState(false);
 
-  const originalImagePath = `/images/${imageName}_left.png`;
-  const segmentedImagePath = `/images/${imageName}_right.png`;
+  const originalImagePath = `/images/${imageName}.png`;
+  const segmentedImagePath = `/images/${imageName}_seg.png`;
   const dice = (Math.random() * 0.1 + 0.8).toFixed(3); 
 
 
